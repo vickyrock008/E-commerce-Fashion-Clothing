@@ -2,17 +2,19 @@
 FROM python:3.10-slim
 
 # Set the working directory in the container
-WORKDIR /code
+WORKDIR /app
 
-# Copy the requirements file into the container at /code
-COPY ./requirements.txt /code/requirements.txt
+# Copy the requirements file into the container at /app
+COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the ./app directory from the host to /code/app in the container
-COPY ./app /code/app
+# Copy the rest of the application code into the container
+COPY . .
 
-# Command to run the application
-# Uvicorn will run on 0.0.0.0 to be accessible from outside the container
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Run the startup script
+CMD ["bash", "start.sh"]
