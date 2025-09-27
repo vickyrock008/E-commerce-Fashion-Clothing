@@ -40,7 +40,8 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 # --- CORS CONFIGURATION ---
 allowed_origins = [
     settings.FRONTEND_URL,
-    "https://outfit-oracle-idx5.onrender.com",
+    # ✨ FIX: Replaced the old Render URL with your new frontend URL
+    "https://outfit-oracle-idu5.onrender.com",
 ]
 
 app.add_middleware(
@@ -52,6 +53,17 @@ app.add_middleware(
 )
 
 # --- Include Routers ---
+# ✨ FIX: Added all the missing routers. This will fix the 404 errors.
+app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(products.router)
+app.include_router(categories.router)
 app.include_router(checkout.router)
-# ... (rest of your file remains the same) ...
+app.include_router(orders.router)
+app.include_router(contact.router)
+
+
+@app.get("/")
+def root():
+    return {"message": "fashion clothing backend is running."}
+
