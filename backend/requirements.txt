@@ -3,7 +3,7 @@ uvicorn[standard]==0.23.2
 sqlalchemy==2.0.21
 pydantic[email]==2.4.2
 pydantic-settings==2.0.3
-passlib[bcrypt]==1.7.4
+passlib[bcrypt]
 python-jose[cryptography]==3.3.0
 fastapi-mail==1.4.1
 python-multipart==0.0.6
