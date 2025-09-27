@@ -5,18 +5,19 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from . import models, schemas
-from .database import get_db
+from . import models
+from .config import settings
 
 # --- CONFIGURATION ---
-SECRET_KEY = "a_very_secret_key_for_our_butcher_shop"
-# ✨ THE FIX IS HERE: The correct algorithm is HS256, not HS260
+# ✨ FIX: SECRET_KEY is now correctly loaded from environment settings
+SECRET_KEY = settings.SECRET_KEY
+# ✨ FIX: The correct algorithm is HS256, not HS260
 ALGORITHM = "HS256" 
 ACCESS_TOKEN_EXPIRE_MINUTES = 10080 # 7 days
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
-# --- BADGE CREATION ---
+# --- TOKEN CREATION ---
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -24,8 +25,8 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-# --- BADGE CHECKING ---
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+# --- TOKEN VALIDATION & USER RETRIEVAL ---
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(models.get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -44,7 +45,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     return user
 
-# --- PERMISSION CHECKING ---
+# --- PERMISSION CHECKING (ADMIN GUARD) ---
 def require_admin_user(current_user: models.User = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(
