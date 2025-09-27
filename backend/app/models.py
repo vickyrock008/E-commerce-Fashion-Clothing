@@ -4,11 +4,10 @@ from sqlalchemy.orm import relationship
 from .database import Base
 import datetime
 
-# ✨ FIX: Explicitly require the 'bcrypt' backend for passlib.
-# This helps resolve potential conflicts in some environments.
 from passlib.context import CryptContext
+# ✨ FIX: The CryptContext is already configured to use bcrypt via the 'schemes' argument.
+# The incorrect .load_path() line has been removed to fix the FileNotFoundError.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-pwd_context.load_path("bcrypt")
 
 
 class User(Base):
@@ -82,13 +81,10 @@ class ContactSubmission(Base):
 
 
 def verify_password(plain_password, hashed_password):
-    # Truncate plain password for verification as well, just in case.
     password_bytes = plain_password.encode('utf-8')
     return pwd_context.verify(password_bytes[:72], hashed_password)
 
 def get_password_hash(password):
-    # ✨ FIX: Truncate the password to 72 bytes before hashing to prevent ValueError.
-    # The bcrypt algorithm has a maximum password length of 72.
     password_bytes = password.encode('utf-8')
     return pwd_context.hash(password_bytes[:72])
 
