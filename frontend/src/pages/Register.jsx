@@ -115,7 +115,6 @@ export default function Register() {
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
-              width="100%"
             />
           </div>
         </div>
