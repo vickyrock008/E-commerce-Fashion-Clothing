@@ -6,6 +6,7 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
 });
 
+// Interceptor to add the JWT token to every outgoing request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -19,9 +20,10 @@ api.interceptors.request.use(
   }
 );
 
-// We add an interceptor to check all responses from the backend.
+// Interceptor to handle 401 Unauthorized errors globally
+// This prevents the app from breaking if a token expires.
 api.interceptors.response.use(
-  (response) => response, // If the response is successful, just pass it along.
+  (response) => response, 
   (error) => {
     // If the error is a 401 (Unauthorized)...
     if (error.response && error.response.status === 401) {
@@ -29,12 +31,14 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       // And redirect the user to the login page to get a new token.
-      window.location = '/login'; 
+      // We check to make sure we're not already on the login page to avoid a loop.
+      if (window.location.pathname !== '/login') {
+        window.location = '/login'; 
+      }
     }
     // For any other errors, we just let them proceed as normal.
     return Promise.reject(error);
   }
 );
-
 
 export default api;
