@@ -11,6 +11,7 @@ from .config import settings
 from contextlib import asynccontextmanager
 from .seed_products import seed_data
 import os
+import asyncio 
 
 # --- Lifespan Context Manager for Startup/Shutdown Events ---
 # This function replaces the older @app.on_event("startup") decorator.
@@ -18,8 +19,6 @@ import os
 async def lifespan(app: FastAPI):
     # --- Startup Event ---
     # Run seeding function on startup (Preserving existing functionality)
-    # NOTE: Since seed_data is synchronous, the ASGI server will block while it runs.
-    # This is generally acceptable for initial setup/seeding.
     print("Seeding data...")
     seed_data()
     print("Seeding complete!")
@@ -42,17 +41,19 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # --- CORS CONFIGURATION FIX (Hardened) ---
 
-# 4. Define allowed origins using the FRONTEND_URL from settings
+# 4. Define allowed origins using the FRONTEND_URL from settings.
+# We explicitly add the origin seen in your screenshot for debugging robustness.
 allowed_origins = [
     settings.FRONTEND_URL,
-    "*", 
+    # The domain from your browser's error message:
+    "https://outfit-oracle-idx5.onrender.com", 
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins, 
     allow_credentials=True, 
-    # ✨ FIX: Explicitly include POST and OPTIONS methods for registration
+    # Explicitly include OPTIONS as pre-flight checks are crucial for CORS
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
     allow_headers=["*"],
 )
