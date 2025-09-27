@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Backend FastAPI Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+    env_file:
+      - ./app/.env
+    depends_on:
+      - db
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fashiondb
+    ports:
+      - "5432:5432"
+
+  # Frontend React Service (Example Configuration)
+  frontend:
+    build:
+      context: ./src # Assuming your React app is in the 'src' directory
+      dockerfile: Dockerfile.frontend # You would need to create this Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Helps with hot-reloading in some Docker setups
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

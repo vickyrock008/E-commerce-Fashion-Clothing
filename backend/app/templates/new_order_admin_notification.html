@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Order Received!</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; }
+        .container { max-width: 550px; margin: 40px auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid #28a745; }
+        .header h1 { font-size: 22px; color: #28a745; margin: 0 0 20px; padding-bottom: 20px; border-bottom: 1px solid #dee2e6;}
+        .content { line-height: 1.6; font-size: 16px; color: #495057; }
+        .info-block { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 25px 0; }
+        .info-block p { margin: 0 0 8px; }
+        .order-details { width: 100%; border-collapse: collapse; margin: 25px 0; }
+        .order-details th, .order-details td { text-align: left; padding: 12px 0; border-bottom: 1px solid #dee2e6; }
+        .order-details th { text-transform: uppercase; font-size: 14px; color: #212529; }
+        .total { text-align: right; font-weight: bold; font-size: 1.2em; margin-top: 20px; }
+        .button-wrapper { text-align: center; margin: 30px 0 15px; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #343a40; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-size: 14px; }
+        .footer { text-align: center; padding-top: 15px; font-size: 12px; color: #adb5bd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>New Order Received!</h1></div>
+        <div class="content">
+            <p>A new order has been placed. Please review the details below.</p>
+            
+            <div class="info-block">
+                <p><strong>Order ID:</strong> #{{ order_id }}</p>
+                <p><strong>Customer Name:</strong> {{ customer_name }}</p>
+                <p><strong>Phone:</strong> {{ customer_phone }}</p>
+                <p><strong>Address:</strong> {{ address }}</p>
+            </div>
+
+            <table class="order-details">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th style="text-align: right;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ items_html | safe }}
+                </tbody>
+            </table>
+
+            <p class="total">Total: ₹{{ total }}</p>
+
+            <div class="button-wrapper">
+                <a href="{{ admin_order_link }}" class="button">View Order in Admin Panel</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>This is an automated notification from The Outfit Oracle system.</p>
+        </div>
+    </div>
+</body>
+</html>

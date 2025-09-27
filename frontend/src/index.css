@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-gray-50 text-gray-900; }
+
+/* Hide the default Swiper arrows since we are using custom ones */
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  display: none;
+}
+
+/* ✨ Custom Swiper Pagination Styles ✨ */
+/* This styles the container for the dots */
+.swiper-pagination {
+    @apply bottom-2 !important;
+}
+
+/* This styles each individual dot */
+.swiper-pagination-bullet {
+    /* Make dots more visible on dark backgrounds */
+    @apply bg-white opacity-70 w-2.5 h-2.5 transition-all duration-300;
+}
+
+/* This styles the currently active dot */
+.swiper-pagination-bullet-active {
+    /* Use a brand color and make it wider */
+    @apply !bg-red-500 w-6 rounded-full opacity-100;
+}
+
+/* ✨ Ensure carousel navigation buttons are always on top */
+.swiper-button-prev, .swiper-button-next {
+    @apply z-30;
+}
