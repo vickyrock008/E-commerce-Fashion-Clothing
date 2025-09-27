@@ -39,3 +39,8 @@ app.include_router(contact.router)
 @app.get('/')
 def root():
     return {"message": "fashion clothing backend is running."}
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health_check():
+    """Simple endpoint to confirm the API is running."""
+    return {"status": "ok"}
