@@ -42,6 +42,8 @@ export default function Home({ addToCart }) {
   const [products, setProducts] = useState([]);
   const [isMuted, setIsMuted] = useState(true); // 争 Start in a muted state
   const videoRef = useRef(null);
+  const [loading, setLoading] = useState(true); // <-- ADD THIS
+  const [error, setError] = useState(null);     // <-- ADD THIS
 
   // This IntersectionObserver correctly handles play/pause on scroll. No changes needed here.
   useEffect(() => {
@@ -72,19 +74,34 @@ export default function Home({ addToCart }) {
     };
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+    setLoading(true); // Start loading
+    setError(null);   // Clear previous errors
+
+    // Set a timeout to check if it's taking too long
+    const timer = setTimeout(() => {
+        setError("The server is waking up, this might take a moment. Please wait...");
+    }, 5000); // After 5 seconds, show the wake-up message
+
     api
       .get('/api/products/')
       .then((r) => {
+        clearTimeout(timer); // Success! Cancel the timer.
         if (Array.isArray(r.data)) {
           setProducts(r.data);
         } else {
           setProducts([]);
         }
+        setError(null); // Clear any errors
       })
       .catch((err) => {
+        clearTimeout(timer); // An error happened, cancel the timer.
         console.error("Failed to fetch products:", err);
+        setError("Could not load products. Please try refreshing the page.");
         setProducts([]);
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading
       });
   }, []);
 
@@ -225,10 +242,10 @@ export default function Home({ addToCart }) {
       {/* Featured Products */}
       <div className="mx-auto max-w-full px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <h2 className="text-3xl font-bold tracking-tight text-center text-gray-800 mb-8">Featured Products</h2>
-        {products.length > 0 ? (
+        {loading && !error && <p className="text-center text-gray-500">Loading products...</p>}
+        {error && <p className="text-center text-red-500 font-semibold">{error}</p>}
+        {!loading && !error && products.length > 0 && (
             <ProductCarousel products={products} addToCart={addToCart} />
-        ) : (
-            <p className="text-center text-gray-500">Loading products...</p>
         )}
       </div>
     </div>
