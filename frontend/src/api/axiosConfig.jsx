@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: 'https://the-outfit-oracle.onrender.com',
 });
 
 api.interceptors.request.use(
@@ -17,7 +17,6 @@ api.interceptors.request.use(
   }
 );
 
-// ✨ This is the new, important part! ✨
 // We add an interceptor to check all responses from the backend.
 api.interceptors.response.use(
   (response) => response, // If the response is successful, just pass it along.
@@ -37,3 +36,4 @@ api.interceptors.response.use(
 
 
 export default api;
+
