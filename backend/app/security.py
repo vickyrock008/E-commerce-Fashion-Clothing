@@ -7,11 +7,11 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from . import models
 from .config import settings
+# ✨ FIX: Import get_db from the correct module, 'database'
+from .database import get_db
 
 # --- CONFIGURATION ---
-# ✨ FIX: SECRET_KEY is now correctly loaded from environment settings
 SECRET_KEY = settings.SECRET_KEY
-# ✨ FIX: The correct algorithm is HS256, not HS260
 ALGORITHM = "HS256" 
 ACCESS_TOKEN_EXPIRE_MINUTES = 10080 # 7 days
 
@@ -26,7 +26,8 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 # --- TOKEN VALIDATION & USER RETRIEVAL ---
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(models.get_db)):
+# ✨ FIX: The dependency now correctly points to get_db from the database module.
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -53,3 +54,4 @@ def require_admin_user(current_user: models.User = Depends(get_current_user)):
             detail="Admin privileges required",
         )
     return current_user
+
