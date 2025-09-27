@@ -12,7 +12,7 @@ export default function ProductDetail({ addToCart }){
     const fetchProductData = async () => {
         try {
             const [productResponse, allProductsResponse] = await Promise.all([
-                api.get(`/api/products/${id}/`),
+                api.get(`/api/products/${id}`),
                 api.get('/api/products/')
             ]);
             
@@ -35,7 +35,7 @@ export default function ProductDetail({ addToCart }){
 
   if(!p) return <div>Loading...</div>
 
-  // ✨ FIX: Construct the full image URL for the main product image
+  // ✨ FIX: Construct the full, absolute image URL for the main product image
   const imageUrl = p.image ? `${import.meta.env.VITE_API_URL}${p.image}` : '';
 
   return (
@@ -52,7 +52,7 @@ export default function ProductDetail({ addToCart }){
         <div>
             <h1 className='text-4xl font-extrabold tracking-tight'>{p.name}</h1>
             <p className='mt-4 text-gray-600 leading-relaxed'>{p.description}</p>
-            <div className='mt-6 text-3xl font-bold text-gray-700'>₹{p.price}</div>
+            <div className='mt-6 text-3xl font-bold text-gray-700'>₹{p.price.toFixed(2)}</div>
             
             <div className="mt-6">
                 {p.stock > 0 ? (
