@@ -17,10 +17,9 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // ✨ FIX: Add client-side validation for password length.
     if (password.length < 8) {
       toast.error('Password must be at least 8 characters long.');
-      return; // Stop the function if validation fails
+      return; 
     }
 
     try {
@@ -32,12 +31,9 @@ export default function Register() {
       toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (error) {
-      // ✨ FIX: Provide more specific error feedback from the backend.
       if (error.response && error.response.data && error.response.data.detail) {
-        // If the backend provides a specific error message, show it.
         toast.error(error.response.data.detail);
       } else {
-        // Otherwise, show a generic message.
         toast.error('Failed to register. The email might already be in use.');
       }
       console.error("Registration error:", error.response || error);
@@ -105,8 +101,9 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
-              // ✨ FIX: Add minLength attribute for browser-level validation and accessibility.
               minLength="8"
+              // ✨ FIX: Add maxLength to prevent users from entering a password that's too long.
+              maxLength="72"
             />
           </div>
           <button
@@ -137,4 +134,3 @@ export default function Register() {
     </div>
   );
 }
-
