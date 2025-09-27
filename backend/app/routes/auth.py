@@ -97,3 +97,9 @@ async def google_login(token_data: schemas.GoogleToken, db: Session = Depends(ge
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Google token",
         )
+
+# ✨ ADD THIS TEST CODE BELOW ✨
+@router.get("/test")
+def test_route():
+    return {"message": "Deployment is working!"}
+# ✨ END OF TEST CODE ✨
