@@ -10,7 +10,7 @@ class UserBase(BaseModel):
     email: EmailStr # This will now work correctly
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(..., min_length=8, max_length=72)
 
 class UserOut(UserBase):
     id: int
