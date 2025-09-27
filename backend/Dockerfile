@@ -2,25 +2,16 @@
 FROM python:3.10-slim
 
 # Set the working directory in the container
-WORKDIR /code
+WORKDIR /app
 
-# Copy the requirements file into the container at /code
-COPY ./requirements.txt /code/requirements.txt
+# Copy the requirements file into the container at /app
+COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
-COPY ./app /code/app
+# Copy the rest of the application's code into the container at /app
+COPY . .
 
-# --- CHANGES START HERE ---
-
-# 1. Copy the new startup script into the container
-COPY ./start.sh /code/start.sh
-
-# 2. Make the script executable
-RUN chmod +x /code/start.sh
-
-# 3. Set the new script as the command to run when the container starts
-CMD ["/code/start.sh"]
-
+# Command to run the application
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
