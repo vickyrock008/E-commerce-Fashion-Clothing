@@ -5,7 +5,6 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { UserContext } from '../context/UserContext';
-// ✨ FIX: Import the configured 'api' instance instead of the global 'axios'
 import api from '../api/axiosConfig';
 
 export default function Register() {
@@ -17,8 +16,14 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    // ✨ FIX: Add client-side validation for password length.
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters long.');
+      return; // Stop the function if validation fails
+    }
+
     try {
-      // ✨ FIX: Use the configured 'api' instance and a relative path.
       await api.post('/api/auth/register', {
         name,
         email,
@@ -27,13 +32,20 @@ export default function Register() {
       toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (error) {
-      toast.error('Failed to register. The email might already be in use.');
+      // ✨ FIX: Provide more specific error feedback from the backend.
+      if (error.response && error.response.data && error.response.data.detail) {
+        // If the backend provides a specific error message, show it.
+        toast.error(error.response.data.detail);
+      } else {
+        // Otherwise, show a generic message.
+        toast.error('Failed to register. The email might already be in use.');
+      }
+      console.error("Registration error:", error.response || error);
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      // ✨ FIX: Use the configured 'api' instance.
       const response = await api.post(
         `/api/auth/google-login`,
         { token: credentialResponse.credential }
@@ -93,6 +105,8 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
+              // ✨ FIX: Add minLength attribute for browser-level validation and accessibility.
+              minLength="8"
             />
           </div>
           <button
@@ -123,3 +137,4 @@ export default function Register() {
     </div>
   );
 }
+
