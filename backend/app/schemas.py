@@ -1,6 +1,6 @@
 # app/schemas.py
 
-from pydantic import BaseModel, EmailStr, Field # ✨ 1. Import Field to fix the error
+from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 import datetime
 
@@ -10,7 +10,9 @@ class UserBase(BaseModel):
     email: EmailStr
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, max_length=72) # This will now work correctly
+    # ✨ FIX: Enforce password length constraints at the API level.
+    # This prevents oversized passwords from ever reaching the hashing function.
+    password: str = Field(..., min_length=8, max_length=72)
 
 class UserOut(UserBase):
     id: int
