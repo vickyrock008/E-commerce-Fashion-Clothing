@@ -2,21 +2,29 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# ✨ 1. Import StaticFiles
 from fastapi.staticfiles import StaticFiles
 from .database import engine, Base
 from . import models
 from .routes import products, checkout, categories, auth, users, orders, contact
 import os
+from contextlib import asynccontextmanager
+from .seed_products import seed_data
 
 # This line ensures all your tables are created when the app starts
-models.Base.metadata.create_all(bind=engine) 
+models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title=" Fashion clothing API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Run seeding function on startup
+    print("Seeding data...")
+    seed_data()
+    print("Seeding complete!")
+    yield
 
-# ✨ 2. Mount the static directory to serve image files
-# This makes any file inside the 'static' folder available at the '/static' URL
-# The corrected line in app/main.py
+app = FastAPI(title="Fashion clothing API", lifespan=lifespan)
+
+
+# Mount the static directory to serve image files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
@@ -39,8 +47,3 @@ app.include_router(contact.router)
 @app.get('/')
 def root():
     return {"message": "fashion clothing backend is running."}
-
-@app.get("/health", status_code=status.HTTP_200_OK)
-def health_check():
-    """Simple endpoint to confirm the API is running."""
-    return {"status": "ok"}
