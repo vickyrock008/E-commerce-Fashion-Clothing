@@ -6,69 +6,52 @@ from fastapi.staticfiles import StaticFiles
 from .database import engine, Base
 from . import models
 from .routes import products, checkout, categories, auth, users, orders, contact
-from .config import settings 
-# ✨ 1. New Imports for Lifespan and Seeding
+from .config import settings
 from contextlib import asynccontextmanager
 from .seed_products import seed_data
-import os
-import asyncio 
+import os # 👈 Import the 'os' module
 
 # --- Lifespan Context Manager for Startup/Shutdown Events ---
-# This function replaces the older @app.on_event("startup") decorator.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # --- Startup Event ---
-    # Run seeding function on startup (Preserving existing functionality)
     print("Seeding data...")
     seed_data()
     print("Seeding complete!")
-    
-    # Yield control to the application to start serving requests
     yield
-    
-    # --- Shutdown Event (Nothing needed here for this app yet) ---
     print("Application shutdown complete.")
 
+# Create all database tables
+models.Base.metadata.create_all(bind=engine)
 
-# This line ensures all your tables are created when the app starts
-models.Base.metadata.create_all(bind=engine) 
+# Initialize the FastAPI app
+app = FastAPI(title="Fashion clothing API", lifespan=lifespan)
 
-# ✨ 2. Pass the lifespan context manager to the FastAPI app
-app = FastAPI(title=" Fashion clothing API", lifespan=lifespan)
+# --- ✨ PATH FIX IS HERE ---
+# 1. Get the absolute path to the directory containing main.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 2. Join it with the relative path to your static directory
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# 3. Mount the static directory to serve image files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+# 3. Mount the static directory using the new, robust absolute path
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# --- ✨ END OF PATH FIX ---
 
-# --- CORS CONFIGURATION FIX (Hardened) ---
 
-# 4. Define allowed origins using the FRONTEND_URL from settings.
-# We explicitly add the origin seen in your screenshot for debugging robustness.
+# --- CORS CONFIGURATION ---
 allowed_origins = [
     settings.FRONTEND_URL,
-    # The domain from your browser's error message:
-    "https://outfit-oracle-idx5.onrender.com", 
+    "https://outfit-oracle-idx5.onrender.com",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins, 
-    allow_credentials=True, 
-    # Explicitly include OPTIONS as pre-flight checks are crucial for CORS
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# --- END CORS CONFIGURATION FIX ---
-
-# Include all the API routes from your application
+# --- Include Routers ---
 app.include_router(products.router)
 app.include_router(checkout.router)
-app.include_router(categories.router)
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(orders.router)
-app.include_router(contact.router)
-
-@app.get('/')
-def root():
-    return {"message": "fashion clothing backend is running."}
+# ... (rest of your file remains the same) ...
