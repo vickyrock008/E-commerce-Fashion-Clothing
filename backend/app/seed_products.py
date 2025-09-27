@@ -12,7 +12,6 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # --- CONFIGURATION ---
-SCRAPING_DIR = r'C:\Users\vicky.VIGNESH\OneDrive\Desktop\scraping'
 STATIC_IMAGES_DIR = 'app/static/images/products'
 
 # --- PRODUCT NAME MAPPING (Expanded for better variety) ---
@@ -175,49 +174,47 @@ def seed_data():
     try:
         clear_database(db)
 
-        if os.path.exists(STATIC_IMAGES_DIR):
-            shutil.rmtree(STATIC_IMAGES_DIR)
-        os.makedirs(STATIC_IMAGES_DIR)
-        print(f"🚀 Set up a clean image directory at '{STATIC_IMAGES_DIR}'")
+        # Get the list of all image files that were copied to STATIC_IMAGES_DIR
+        all_image_files = os.listdir(STATIC_IMAGES_DIR)
+        
+        # Group images by category based on their filename prefix (e.g., 'hm_men_t-shirts')
+        products_by_category = {}
+        for file_name in all_image_files:
+            prefix = "_".join(file_name.split('_')[:3]).replace('-', '_') # e.g., 'hm_men_t-shirts'
+            if prefix not in products_by_category:
+                products_by_category[prefix] = []
+            products_by_category[prefix].append(file_name)
 
         processed_products = set()
 
-        for subdir, _, files in os.walk(SCRAPING_DIR):
-            if not files:
-                continue
-
-            category_slug = os.path.basename(subdir)
-            category_name = category_slug.replace('hm_', '').replace('_', ' ').title()
+        for category_slug_prefix, file_names in products_by_category.items():
+            category_name = category_slug_prefix.replace('hm_', '').replace('_', ' ').title()
+            category_slug = category_slug_prefix
             category_obj = get_or_create_category(db, category_name, category_slug)
+            
+            for file_name in file_names:
+                product_name = format_product_name(file_name, category_name, category_slug)
+                
+                # Ensure product name is unique
+                original_name = product_name
+                counter = 1
+                while product_name in processed_products:
+                    product_name = f"{original_name} {counter}"
+                    counter += 1
+                processed_products.add(product_name)
 
-            for file_name in files:
-                if file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
-                    source_path = os.path.join(subdir, file_name)
-                    destination_path = os.path.join(STATIC_IMAGES_DIR, file_name)
-                    shutil.copy(source_path, destination_path)
-
-                    product_name = format_product_name(file_name, category_name, category_slug)
-                    
-                    # Ensure product name is unique
-                    original_name = product_name
-                    counter = 1
-                    while product_name in processed_products:
-                        product_name = f"{original_name} {counter}"
-                        counter += 1
-                    processed_products.add(product_name)
-
-                    image_url = f"/static/images/products/{file_name}"
-                    
-                    new_product = Product(
-                        name=product_name,
-                        price=round(random.uniform(500, 5000), 2),
-                        description=f"A high-quality '{product_name}' from our latest collection.",
-                        stock=random.randint(5, 50),
-                        category_id=category_obj.id,
-                        image=image_url,
-                        slug=f"{category_slug}-{os.path.splitext(file_name)[0]}"
-                    )
-                    db.add(new_product)
+                image_url = f"/static/images/products/{file_name}"
+                
+                new_product = Product(
+                    name=product_name,
+                    price=round(random.uniform(500, 5000), 2),
+                    description=f"A high-quality '{product_name}' from our latest collection.",
+                    stock=random.randint(5, 50),
+                    category_id=category_obj.id,
+                    image=image_url,
+                    slug=f"{category_slug}-{os.path.splitext(file_name)[0]}"
+                )
+                db.add(new_product)
         
         db.commit()
         print("\n✅ Successfully seeded the database with new products!")
@@ -230,4 +227,3 @@ def seed_data():
 
 if __name__ == "__main__":
     seed_data()
-
