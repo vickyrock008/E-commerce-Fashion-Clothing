@@ -5,7 +5,7 @@ import api from '../api/axiosConfig.jsx';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext.jsx';
-import placeholderImage from '../assets/images/bg_images/about.png'; // Placeholder for items without an image
+import placeholderImage from '../assets/images/bg_images/about.png';
 import checkoutBg from '../assets/images/bg_images/check.png';
 
 export default function Checkout({ cartItems, clearCart }) {
@@ -18,7 +18,6 @@ export default function Checkout({ cartItems, clearCart }) {
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    // Pre-fill the name field with the logged-in user's name
     if (user) {
       setCustomerInfo(prevInfo => ({...prevInfo, name: user.name, email: user.email }));
     }
@@ -53,7 +52,6 @@ export default function Checkout({ cartItems, clearCart }) {
         loading: 'Placing your order...',
         success: (response) => {
           clearCart();
-          // Pass the professional order ID to the confirmation page
           navigate('/order-confirmation', { state: { orderId: response.data.order_uid } }); 
           return `Order placed successfully!`;
         },
@@ -122,7 +120,6 @@ export default function Checkout({ cartItems, clearCart }) {
                       <li key={item.id} className="flex py-6 items-center">
                         <div className="h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200">
                           <img 
-                            // ✨ Use the corrected full URL here
                             src={imageUrl} 
                             alt={item.name} 
                             className="h-full w-full object-cover object-center"
