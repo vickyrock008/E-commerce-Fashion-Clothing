@@ -26,8 +26,6 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     slug = Column(String, unique=True, index=True)
-    # ✨ FIX: Added cascade="all, delete-orphan"
-    # This tells SQLAlchemy to delete all related products when a category is deleted.
     products = relationship("Product", back_populates="category", cascade="all, delete-orphan")
 
 class Product(Base):
@@ -39,8 +37,6 @@ class Product(Base):
     price = Column(Float)
     image = Column(String, default="")
     stock = Column(Integer, default=0)
-    # ✨ FIX: Added ondelete="CASCADE" to the ForeignKey.
-    # This enforces the deletion at the database level for extra safety.
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"))
     category = relationship("Category", back_populates="products")
 
@@ -86,4 +82,7 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    # ✨ FIX: Truncate the password to 72 bytes before hashing to prevent ValueError.
+    # The bcrypt algorithm has a maximum password length of 72.
+    password_bytes = password.encode('utf-8')
+    return pwd_context.hash(password_bytes[:72])
