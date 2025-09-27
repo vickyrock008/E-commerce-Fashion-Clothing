@@ -1,11 +1,12 @@
 // src/pages/Login.jsx
 
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import { GoogleLogin } from '@react-oauth/google';
+// ✨ FIX: Import the configured 'api' instance instead of the global 'axios'
+import api from '../api/axiosConfig';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,8 +22,10 @@ export default function Login() {
     params.append('password', password);
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/token`,
+      // ✨ FIX: Use the configured 'api' instance.
+      // No need to specify the full URL here anymore.
+      const response = await api.post(
+        `/api/auth/token`,
         params,
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
@@ -38,8 +41,9 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/google-login`,
+      // ✨ FIX: Use the configured 'api' instance.
+      const response = await api.post(
+        `/api/auth/google-login`,
         { token: credentialResponse.credential }
       );
       const { access_token, user } = response.data;
