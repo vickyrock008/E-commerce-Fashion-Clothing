@@ -39,7 +39,7 @@ export default function UserContextProvider({ children }) {
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
-    // ✨ THE FIX IS HERE: Redirect to the home page instead of just reloading.
+    // ✨ FIX: Redirect to the home page instead of just reloading for a smoother UX.
     window.location.href = '/';
   };
 
