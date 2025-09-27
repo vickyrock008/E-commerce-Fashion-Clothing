@@ -10,14 +10,17 @@ COPY ./requirements.txt /code/requirements.txt
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Copy the ./app directory from the host to /code/app in the container
+# Copy the application code
 COPY ./app /code/app
 
-# ✨ NEW STEP: Run the seed_products.py script to populate the database.
-# This happens during the build, before the server starts.
-RUN python -m app.seed_products
+# --- CHANGES START HERE ---
 
-# Command to run the application
-# Uvicorn will run on 0.0.0.0 to be accessible from outside the container
-# We remove "--reload" for production as Render handles restarting.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 1. Copy the new startup script into the container
+COPY ./start.sh /code/start.sh
+
+# 2. Make the script executable
+RUN chmod +x /code/start.sh
+
+# 3. Set the new script as the command to run when the container starts
+CMD ["/code/start.sh"]
+
