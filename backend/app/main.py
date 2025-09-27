@@ -40,9 +40,9 @@ app = FastAPI(title=" Fashion clothing API", lifespan=lifespan)
 # 3. Mount the static directory to serve image files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# --- CORS CONFIGURATION FIX (Already done in previous step) ---
+# --- CORS CONFIGURATION FIX (Hardened) ---
 
-# ✨ 4. Define allowed origins using the FRONTEND_URL from settings
+# 4. Define allowed origins using the FRONTEND_URL from settings
 allowed_origins = [
     settings.FRONTEND_URL,
     "*", 
@@ -52,7 +52,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins, 
     allow_credentials=True, 
-    allow_methods=["*"],
+    # ✨ FIX: Explicitly include POST and OPTIONS methods for registration
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
     allow_headers=["*"],
 )
 
