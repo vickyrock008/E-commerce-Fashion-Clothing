@@ -12,10 +12,10 @@ conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,
     MAIL_PASSWORD=settings.MAIL_PASSWORD,
     MAIL_FROM=settings.MAIL_FROM,
-    MAIL_PORT=settings.MAIL_PORT,
+    MAIL_PORT=465,  # Changed from 587 to 465
     MAIL_SERVER=settings.MAIL_SERVER,
-    MAIL_STARTTLS=settings.MAIL_STARTTLS,
-    MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+    MAIL_STARTTLS=False,  # Changed from True to False
+    MAIL_SSL_TLS=True,  # Changed from False to True
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
     TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
@@ -200,4 +200,3 @@ async def send_order_cancelled_admin_notification(order_id: int):
         print(f"✅ Admin cancellation notification sent for order #{order.order_uid}")
     finally:
         db.close()
-
