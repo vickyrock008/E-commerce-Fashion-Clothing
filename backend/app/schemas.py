@@ -1,21 +1,22 @@
 # app/schemas.py
 
-from pydantic import BaseModel, EmailStr # ✨ 1. Import EmailStr to fix the error
+from pydantic import BaseModel, EmailStr, Field # ✨ 1. Import Field to fix the error
 from typing import List, Optional
 import datetime
 
 # --- Schemas for Users ---
 class UserBase(BaseModel):
     name: str
-    email: EmailStr # This will now work correctly
+    email: EmailStr
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, max_length=72)
+    password: str = Field(..., min_length=8, max_length=72) # This will now work correctly
 
 class UserOut(UserBase):
     id: int
     is_active: int
     role: str
+
     class Config:
         from_attributes = True
 
@@ -48,6 +49,7 @@ class ProductUpdate(BaseModel):
 class ProductOut(ProductBase):
     id: int
     stock: int
+
     class Config:
         from_attributes = True
 
@@ -69,6 +71,7 @@ class CategoryUpdate(BaseModel):
 class CategoryOut(CategoryBase):
     id: int
     products: List[ProductOut] = []
+
     class Config:
         from_attributes = True
 
@@ -88,6 +91,7 @@ class OrderItemOut(BaseModel):
     product_name: str
     qty: int
     subtotal: float
+
     class Config:
         from_attributes = True
 
@@ -120,6 +124,7 @@ class ContactSubmissionCreate(BaseModel):
 class ContactSubmissionOut(ContactSubmissionCreate):
     id: int
     submitted_at: datetime.datetime
+
     class Config:
         from_attributes = True
 
