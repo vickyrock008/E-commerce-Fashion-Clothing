@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+// ✨ FIX: The baseURL is now read from your environment variables.
+// This makes it easy to switch between local and production URLs.
 const api = axios.create({
-    baseURL: 'https://the-outfit-oracle.onrender.com',
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use(
@@ -36,4 +38,3 @@ api.interceptors.response.use(
 
 
 export default api;
-
