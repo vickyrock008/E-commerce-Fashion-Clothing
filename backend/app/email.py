@@ -36,15 +36,12 @@ async def send_email(to_email: str, subject: str, template_name: str, template_b
     """
     Constructs and sends an email using the SendGrid Web API.
     """
-    # Load the HTML template from the file
     template_path = Path(__file__).parent / 'templates' / template_name
     html_content = template_path.read_text()
 
-    # Replace placeholders with values from template_body
     for key, value in template_body.items():
         html_content = html_content.replace(f"{{{{ {key} }}}}", str(value))
     
-    # The | safe filter is Jinja2 specific, so we manually handle the HTML items
     if 'items_html' in template_body:
          html_content = html_content.replace("{{ items_html | safe }}", template_body['items_html'])
 
@@ -55,9 +52,9 @@ async def send_email(to_email: str, subject: str, template_name: str, template_b
         html_content=html_content
     )
     try:
-        # Use the MAIL_PASSWORD as the SendGrid API key
         sg = SendGridAPIClient(settings.MAIL_PASSWORD)
-        response = await sg.send(message)
+        # FIX: The sendgrid library's send method is not async, so we remove 'await'
+        response = sg.send(message)
         print(f"✅ Email sent to {to_email}. Status code: {response.status_code}")
     except Exception as e:
         print(f"❌ Failed to send email to {to_email}. Error: {e}")
