@@ -29,7 +29,7 @@ export default function About() {
       className="relative bg-cover bg-center bg-fixed min-h-screen -m-4 py-16 sm:py-24 rounded-xl overflow-hidden"
       style={{ backgroundImage: `url(${aboutBg})` }}
     >
-      <div className="absolute inset-0 bg-black/40"></div>
+      
       <div className="relative container mx-auto px-6 md:px-12 py-12">
         
         <motion.div 
