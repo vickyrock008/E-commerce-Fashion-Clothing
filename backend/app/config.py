@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from typing import Optional
 
 class Settings(BaseSettings):
     # --- Database ---
@@ -12,14 +13,18 @@ class Settings(BaseSettings):
     BACKEND_URL: str
 
     # --- Mail Settings ---
-    MAIL_USERNAME: str
+    # These are required for the SendGrid API
     MAIL_PASSWORD: str
     MAIL_FROM: str
-    MAIL_PORT: int
-    MAIL_SERVER: str
-    MAIL_STARTTLS: bool
-    MAIL_SSL_TLS: bool
     ADMIN_EMAIL: str
+    
+    # These are now optional as they were for the old SMTP method
+    MAIL_USERNAME: Optional[str] = None
+    MAIL_PORT: Optional[int] = None
+    MAIL_SERVER: Optional[str] = None
+    MAIL_STARTTLS: Optional[bool] = None
+    MAIL_SSL_TLS: Optional[bool] = None
+
 
     # --- Google OAuth ---
     GOOGLE_CLIENT_ID: str
