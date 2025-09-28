@@ -6,7 +6,6 @@ pydantic-settings==2.0.3
 passlib
 bcrypt==3.2.0
 python-jose[cryptography]==3.3.0
-fastapi-mail==1.4.1
 python-multipart==0.0.6
 google-auth==2.23.2
 httpx==0.25.0
