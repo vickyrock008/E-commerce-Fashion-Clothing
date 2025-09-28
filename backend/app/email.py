@@ -8,14 +8,17 @@ from .database import SessionLocal
 from . import crud
 
 # --- Email Connection Configuration ---
+# CORRECTED FIX: Switched to port 587 and enabled STARTTLS. This is the
+# standard for many email services and is less likely to be blocked by
+# hosting platforms like Render.
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,
     MAIL_PASSWORD=settings.MAIL_PASSWORD,
     MAIL_FROM=settings.MAIL_FROM,
-    MAIL_PORT=465,  # Changed from 587 to 465
+    MAIL_PORT=587,
     MAIL_SERVER=settings.MAIL_SERVER,
-    MAIL_STARTTLS=False,  # Changed from True to False
-    MAIL_SSL_TLS=True,  # Changed from False to True
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
     TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
@@ -200,3 +203,4 @@ async def send_order_cancelled_admin_notification(order_id: int):
         print(f"✅ Admin cancellation notification sent for order #{order.order_uid}")
     finally:
         db.close()
+
